@@ -161,7 +161,7 @@ spec = do
     it "framed message matches a hand-derived vector with all fields set" $ do
       let info = IdentifyInfo
             { idProtocolVersion = Just "ipfs/0.1.0"
-            , idAgentVersion    = Just "libp2p-hs/0.1.0"
+            , idAgentVersion    = Just "hs-libp2p/0.1.0"
             , idPublicKey       = Just "PK"
             , idListenAddrs     =
                 [BS.pack [0x04, 0x7f, 0x00, 0x00, 0x01, 0x06, 0x0f, 0xa1]]
@@ -182,7 +182,7 @@ spec = do
             , BS.pack [0x22, 0x08]                                  -- field 4
             , BS.pack [0x04, 0x7f, 0x00, 0x00, 0x01, 0x06, 0x30, 0x39]
             , BS.pack [0x2a, 0x0a], "ipfs/0.1.0"                    -- field 5
-            , BS.pack [0x32, 0x0f], "libp2p-hs/0.1.0"               -- field 6
+            , BS.pack [0x32, 0x0f], "hs-libp2p/0.1.0"               -- field 6
             ]
       encodeFramedIdentify info `shouldBe` expected
 

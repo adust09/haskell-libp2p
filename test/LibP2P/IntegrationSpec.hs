@@ -205,7 +205,7 @@ spec = do
           Nothing -> expectationFailure "identify timed out"
           Just (Left err) -> expectationFailure $ "identify failed: " ++ err
           Just (Right info) -> do
-            idAgentVersion info `shouldBe` Just "libp2p-hs/0.1.0"
+            idAgentVersion info `shouldBe` Just "hs-libp2p/0.1.0"
             idProtocols info `shouldSatisfy` (not . null)
 
     it "idListenAddrs populated after switchListen" $ do

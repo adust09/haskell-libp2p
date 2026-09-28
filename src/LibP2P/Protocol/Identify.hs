@@ -328,7 +328,7 @@ buildLocalIdentify sw mConn = do
                        (sealPeerRecord (swIdentityKey sw) record)
   pure IdentifyInfo
     { idProtocolVersion = Just "ipfs/0.1.0"
-    , idAgentVersion    = Just "libp2p-hs/0.1.0"
+    , idAgentVersion    = Just "hs-libp2p/0.1.0"
     , idPublicKey       = Just (encodePublicKey (kpPublic (swIdentityKey sw)))
     , idListenAddrs     = addrBytes
     , idObservedAddr    = (\(Multiaddr ps) -> encodeProtocols ps) . connRemoteAddr <$> mConn
