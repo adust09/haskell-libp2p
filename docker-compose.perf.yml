@@ -36,7 +36,7 @@ services:
     build:
       context: .
       dockerfile: interop/perf/Dockerfile
-    image: libp2p-hs-perf:latest
+    image: hs-libp2p-perf:latest
     depends_on:
       redis:
         condition: service_healthy
@@ -48,7 +48,7 @@ services:
     build:
       context: .
       dockerfile: interop/perf/Dockerfile
-    image: libp2p-hs-perf:latest
+    image: hs-libp2p-perf:latest
     depends_on:
       redis:
         condition: service_healthy

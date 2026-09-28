@@ -9,7 +9,7 @@ WORKDIR /app
 
 # Copy only the package description first, so the dependency-build layer below
 # is cached and reused as long as hs-libp2p.cabal / cabal.project are unchanged.
-COPY libp2p-hs.cabal cabal.project ./
+COPY hs-libp2p.cabal cabal.project ./
 
 # Fix ppad-sha256 ARM SHA2 intrinsic compilation on Docker (GCC 12).
 # Only apply ARM-specific flags on aarch64; skip on x86_64.
@@ -24,7 +24,7 @@ RUN if [ "$(uname -m)" = "aarch64" ]; then \
 # source-only edits skip it. We target the library (not the executable) because
 # the executable depends on the local hs-libp2p library, which cannot be built
 # before its source is copied below.
-RUN cabal update && cabal build --only-dependencies lib:libp2p-hs
+RUN cabal update && cabal build --only-dependencies lib:hs-libp2p
 
 # Copy sources and build the project itself.
 COPY src/ src/

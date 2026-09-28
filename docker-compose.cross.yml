@@ -83,7 +83,7 @@ services:
 
   hs-dialer:
     build: .
-    image: libp2p-hs-interop:latest
+    image: hs-libp2p-interop:latest
     depends_on:
       redis:
         condition: service_healthy
@@ -98,7 +98,7 @@ services:
   # --- Test 2: hs listener (modern), go dialer (legacy) ---
   hs-listener:
     build: .
-    image: libp2p-hs-interop:latest
+    image: hs-libp2p-interop:latest
     depends_on:
       redis:
         condition: service_healthy
