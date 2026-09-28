@@ -1,4 +1,4 @@
-# GossipSub cross-implementation interop test: libp2p-hs <-> rust-libp2p.
+# GossipSub cross-implementation interop test: hs-libp2p <-> rust-libp2p.
 # Both peers use the unified-testing "modern" env var and Redis key scheme
 # (the gossipsub mode itself is a local extension, not an upstream contract).
 #

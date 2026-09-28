@@ -1,4 +1,4 @@
-# Cross-implementation perf test: libp2p-hs <-> nim-libp2p.
+# Cross-implementation perf test: hs-libp2p <-> nim-libp2p.
 #
 # nim-libp2p is the reference perf test app for the unified-testing
 # submission (perf/images.yaml: nim-v1.15) and implements the canonical

@@ -1,5 +1,5 @@
 # Makefile for local interop test runs.
-# libp2p-hs speaks the libp2p/unified-testing "modern" transport contract;
+# hs-libp2p speaks the libp2p/unified-testing "modern" transport contract;
 # the go-libp2p cross tests go through the legacy key-translation shims
 # defined in docker-compose.cross.yml.
 

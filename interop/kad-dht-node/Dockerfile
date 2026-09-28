@@ -1,4 +1,4 @@
-# Multi-stage build for libp2p-hs kad-dht interop node.
+# Multi-stage build for hs-libp2p kad-dht interop node.
 # Used by the libp2p/unified-testing kad-dht framework.
 # Follows the same pattern as the transport interop Dockerfile at /Dockerfile.
 

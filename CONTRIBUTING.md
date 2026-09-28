@@ -1,4 +1,4 @@
-# Contributing to libp2p-hs
+# Contributing to hs-libp2p
 
 Thanks for helping build a Haskell implementation of libp2p. This document
 covers how work is picked up, how changes land on `main`, and how releases are
@@ -59,7 +59,7 @@ README. Docker is needed only for the interop tests below.
 ## Code conventions
 
 - Follow the style of the surrounding module. The project uses a single Cabal
-  library; add new modules to `exposed-modules` in `libp2p-hs.cabal`.
+  library; add new modules to `exposed-modules` in `hs-libp2p.cabal`.
 - Protocol buffers are encoded by hand (see `LibP2P.Crypto.Protobuf` and `Core.Binary`); do not
   add a protobuf compiler dependency.
 - Every new protocol feature needs tests. Wire-format tests against vectors
@@ -82,9 +82,9 @@ See `interop/Makefile` for the perf, kad-dht, and gossipsub targets, and
 
 ## Versioning and releases
 
-libp2p-hs follows the
+hs-libp2p follows the
 [Haskell Package Versioning Policy](https://pvp.haskell.org/) (PVP). The
-`version:` field in `libp2p-hs.cabal` is the single source of truth. While the
+`version:` field in `hs-libp2p.cabal` is the single source of truth. While the
 project is on `0.x`:
 
 | Change | Bump | Example |
@@ -112,7 +112,7 @@ to Hackage.
    confirm every issue on it is closed or moved to the next milestone. If
    none exists, skip this step.
 3. Open a PR titled `chore: release vX.Y.Z.W` that changes only the `version:`
-   line in `libp2p-hs.cabal`.
+   line in `hs-libp2p.cabal`.
 4. Once merged, the `Release` workflow (`.github/workflows/release.yml`)
    creates the tag `vX.Y.Z.W` on that commit and a GitHub Release with notes
    generated from the merged PRs, grouped by label. Nobody pushes tags by hand.
@@ -134,7 +134,7 @@ Do not create release branches ahead of time.
    The same review and CI rules apply as for `main`.
 3. After the fix merges, open a second PR against `release/v0.1` titled
    `chore: release v0.1.0.1` that bumps the fourth component in
-   `libp2p-hs.cabal`.
+   `hs-libp2p.cabal`.
 4. The `Release` workflow only watches `main`, so after that PR merges tag the
    release by hand (no local checkout needed):
    `gh release create v0.1.0.1 --target release/v0.1 --title v0.1.0.1 --generate-notes`.

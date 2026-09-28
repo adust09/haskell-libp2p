@@ -1,4 +1,4 @@
-# Perf self-test: libp2p-hs listener + libp2p-hs dialer.
+# Perf self-test: hs-libp2p listener + hs-libp2p dialer.
 #
 # Speaks the unified-testing perf contract: the listener SETs
 # `{TEST_KEY}_listener_multiaddr` in Redis and the dialer polls GET

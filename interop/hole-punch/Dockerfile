@@ -1,4 +1,4 @@
-# Multi-stage build for the libp2p-hs hole-punch test daemon.
+# Multi-stage build for the hs-libp2p hole-punch test daemon.
 # Used by the libp2p/unified-testing hole-punch framework; build context
 # is the repository root.
 
