@@ -1,5 +1,5 @@
 cabal-version:   3.0
-name:            libp2p-hs
+name:            hs-libp2p
 version:         0.1.0.0
 synopsis:        Haskell implementation of the libp2p networking stack
 description:
@@ -134,7 +134,7 @@ executable libp2p-interop
     hedis       >= 0.15 && < 0.16,
     aeson       >= 2.1  && < 2.3,
     stm         >= 2.4  && < 2.6,
-    libp2p-hs
+    hs-libp2p
   ghc-options: -threaded -rtsopts
 
 executable libp2p-perf
@@ -150,7 +150,7 @@ executable libp2p-perf
     time        >= 1.9  && < 2,
     network     >= 3.1  && < 3.3,
     hedis       >= 0.15 && < 0.16,
-    libp2p-hs
+    hs-libp2p
   ghc-options: -threaded -rtsopts
 
 executable libp2p-hole-punch
@@ -165,7 +165,7 @@ executable libp2p-hole-punch
     network     >= 3.1  && < 3.3,
     hedis       >= 0.15 && < 0.16,
     stm         >= 2.4  && < 2.6,
-    libp2p-hs
+    hs-libp2p
   ghc-options: -threaded -rtsopts
 
 executable libp2p-kad-dht-node
@@ -181,10 +181,10 @@ executable libp2p-kad-dht-node
     hedis       >= 0.15 && < 0.16,
     stm         >= 2.4  && < 2.6,
     containers  >= 0.6  && < 0.8,
-    libp2p-hs
+    hs-libp2p
   ghc-options: -threaded -rtsopts
 
-test-suite libp2p-hs-test
+test-suite hs-libp2p-test
   import:          warnings, lang
   type:            exitcode-stdio-1.0
   hs-source-dirs:  test, interop/perf
@@ -274,7 +274,7 @@ test-suite libp2p-hs-test
     bytestring >= 0.10 && < 0.13,
     memory     >= 0.18 && < 0.19,
     text       >= 1.2  && < 2.2,
-    libp2p-hs,
+    hs-libp2p,
     time       >= 1.9 && < 2,
     async      >= 2.2 && < 2.3,
     stm        >= 2.4 && < 2.6,
