@@ -1,4 +1,4 @@
-# Self-test docker-compose for the libp2p-hs kad-dht interop node.
+# Self-test docker-compose for the hs-libp2p kad-dht interop node.
 #
 # Runs the three roles (bootstrap, provider, querier) against each other
 # using Redis for coordination. Mirrors the unified-testing kad-dht pattern.

@@ -1,4 +1,4 @@
-# libp2p-hs
+# hs-libp2p
 
 A Haskell implementation of the [libp2p](https://libp2p.io/) modular peer-to-peer networking stack.
 
@@ -8,7 +8,7 @@ Implementation diversity is a core resilience property of decentralized networks
 a bug in one client must not be able to take down the whole network. Yet in the
 Ethereum ecosystem — whose consensus layer is built on libp2p — there are
 virtually no client implementations written in a pure functional language.
-libp2p-hs exists to widen that diversity: a complete, spec-conformant libp2p
+hs-libp2p exists to widen that diversity: a complete, spec-conformant libp2p
 stack in Haskell, with the type-level guarantees and STM-based concurrency that
 purely functional programming brings to protocol implementation.
 
@@ -86,7 +86,7 @@ cabal test --test-option="--match=Integration"
 
 ## Documentation
 
-**[API Reference](https://adust09.github.io/libp2p-hs/)** — Generated Haddock documentation.
+**[API Reference](https://adust09.github.io/hs-libp2p/)** — Generated Haddock documentation.
 
 ## Specification
 

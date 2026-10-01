@@ -21,16 +21,16 @@ jobs:
       - name: Clone go-libp2p (pinned)
         run: git clone --depth 1 --branch v0.48.0 https://github.com/libp2p/go-libp2p.git go-libp2p
 
-      # Build the libp2p-hs interop image once, with a GHA-backed Docker layer
+      # Build the hs-libp2p interop image once, with a GHA-backed Docker layer
       # cache. The Dockerfile builds dependencies in a separate layer, so this
-      # is fast unless libp2p-hs.cabal changes. Both compose hs services consume
-      # this image via `image: libp2p-hs-interop:latest`.
-      - name: Build libp2p-hs interop image
+      # is fast unless hs-libp2p.cabal changes. Both compose hs services consume
+      # this image via `image: hs-libp2p-interop:latest`.
+      - name: Build hs-libp2p interop image
         uses: docker/build-push-action@v6
         with:
           context: .
           load: true
-          tags: libp2p-hs-interop:latest
+          tags: hs-libp2p-interop:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -94,13 +94,13 @@ jobs:
       - name: Clone nim-libp2p (pinned)
         run: make -C interop nim-libp2p
 
-      - name: Build libp2p-hs perf image
+      - name: Build hs-libp2p perf image
         uses: docker/build-push-action@v6
         with:
           context: .
           file: interop/perf/Dockerfile
           load: true
-          tags: libp2p-hs-perf:latest
+          tags: hs-libp2p-perf:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

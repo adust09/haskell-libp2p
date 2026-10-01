@@ -1,4 +1,4 @@
-# Multi-stage build for libp2p-hs kad-dht interop node.
+# Multi-stage build for hs-libp2p kad-dht interop node.
 # Used by the libp2p/unified-testing kad-dht framework.
 # Follows the same pattern as the transport interop Dockerfile at /Dockerfile.
 
@@ -8,7 +8,7 @@ FROM haskell:9.10-slim-bookworm AS builder
 WORKDIR /app
 
 # Copy package description first for dependency cache
-COPY libp2p-hs.cabal cabal.project ./
+COPY hs-libp2p.cabal cabal.project ./
 
 # Fix ppad-sha256 ARM SHA2 intrinsic compilation on Docker (GCC 12).
 # Only apply ARM-specific flags on aarch64; skip on x86_64.
@@ -19,7 +19,7 @@ RUN if [ "$(uname -m)" = "aarch64" ]; then \
     fi
 
 # Pre-build the library's dependencies
-RUN cabal update && cabal build --only-dependencies lib:libp2p-hs
+RUN cabal update && cabal build --only-dependencies lib:hs-libp2p
 
 # Copy sources and build the kad-dht-node executable
 COPY src/ src/

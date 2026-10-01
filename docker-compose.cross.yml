@@ -1,9 +1,9 @@
-# Cross-implementation interop test: libp2p-hs <-> go-libp2p.
+# Cross-implementation interop test: hs-libp2p <-> go-libp2p.
 #
 # Prerequisites:
 #   git clone --depth 1 --branch v0.48.0 https://github.com/libp2p/go-libp2p.git go-libp2p
 #
-# libp2p-hs speaks the unified-testing "modern" contract (uppercase env vars,
+# hs-libp2p speaks the unified-testing "modern" contract (uppercase env vars,
 # TEST_KEY-namespaced `<TEST_KEY>_listener_multiaddr` list key: the listener
 # RPUSHes and the dialer BLPOPs). The pinned go-libp2p test app is a "legacy"
 # test-plans app (lowercase env vars, `listenerAddr` list). The shim-*
@@ -14,10 +14,10 @@
 # after translating so it never triggers --exit-code-from's abort-on-exit
 # before the dialer finishes; the dialer's own timeout bounds the run.
 #
-# Test 1: go-libp2p listener, libp2p-hs dialer
+# Test 1: go-libp2p listener, hs-libp2p dialer
 #   docker compose -f docker-compose.cross.yml up --build --exit-code-from hs-dialer redis go-listener hs-dialer
 #
-# Test 2: libp2p-hs listener, go-libp2p dialer
+# Test 2: hs-libp2p listener, go-libp2p dialer
 #   docker compose -f docker-compose.cross.yml up --build --exit-code-from go-dialer redis hs-listener go-dialer
 #
 # --exit-code-from <dialer> makes `up` return the dialer's exit code (0 on success),
@@ -83,7 +83,7 @@ services:
 
   hs-dialer:
     build: .
-    image: libp2p-hs-interop:latest
+    image: hs-libp2p-interop:latest
     depends_on:
       redis:
         condition: service_healthy
@@ -98,7 +98,7 @@ services:
   # --- Test 2: hs listener (modern), go dialer (legacy) ---
   hs-listener:
     build: .
-    image: libp2p-hs-interop:latest
+    image: hs-libp2p-interop:latest
     depends_on:
       redis:
         condition: service_healthy

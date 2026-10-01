@@ -1,4 +1,4 @@
-# Multi-stage build for libp2p-hs interop test daemon.
+# Multi-stage build for hs-libp2p interop test daemon.
 # Used by the libp2p/test-plans multidim-interop framework.
 
 # Stage 1: Build with GHC 9.10
@@ -7,8 +7,8 @@ FROM haskell:9.10-slim-bookworm AS builder
 WORKDIR /app
 
 # Copy only the package description first, so the dependency-build layer below
-# is cached and reused as long as libp2p-hs.cabal / cabal.project are unchanged.
-COPY libp2p-hs.cabal cabal.project ./
+# is cached and reused as long as hs-libp2p.cabal / cabal.project are unchanged.
+COPY hs-libp2p.cabal cabal.project ./
 
 # Fix ppad-sha256 ARM SHA2 intrinsic compilation on Docker (GCC 12).
 # Only apply ARM-specific flags on aarch64; skip on x86_64.
@@ -21,9 +21,9 @@ RUN if [ "$(uname -m)" = "aarch64" ]; then \
 # Pre-build the library's dependencies. This is the expensive layer (crypton,
 # cacophony, tls, lens, ...) and is cached unless the cabal file changes, so
 # source-only edits skip it. We target the library (not the executable) because
-# the executable depends on the local libp2p-hs library, which cannot be built
+# the executable depends on the local hs-libp2p library, which cannot be built
 # before its source is copied below.
-RUN cabal update && cabal build --only-dependencies lib:libp2p-hs
+RUN cabal update && cabal build --only-dependencies lib:hs-libp2p
 
 # Copy sources and build the project itself.
 COPY src/ src/
