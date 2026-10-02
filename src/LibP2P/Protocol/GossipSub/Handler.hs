@@ -38,8 +38,9 @@ import Control.Concurrent.STM
   , writeTVar
   , modifyTVar'
   )
-import Control.Exception (SomeException, catch)
+import Control.Exception (SomeException, catch, onException)
 import Data.ByteString (ByteString)
+import Data.IORef (IORef, newIORef, readIORef, writeIORef)
 import qualified Data.Map.Strict as Map
 import Data.Time.Clock (getCurrentTime)
 import LibP2P.Crypto.PeerId (PeerId)
@@ -47,6 +48,7 @@ import LibP2P.MultistreamSelect.Negotiation
   ( NegotiationResult (..)
   , ProtocolId
   , StreamIO (..)
+  , closeQuietly
   , negotiateInitiator
   )
 import LibP2P.Protocol.GossipSub.Heartbeat (runHeartbeat)
@@ -77,11 +79,11 @@ import LibP2P.Protocol.GossipSub.Types
   , emptyRPC
   , maxRPCSize
   )
+import LibP2P.Switch.Connection (newStream)
 import LibP2P.Switch.ConnPool (lookupConn)
 import LibP2P.Switch (removeStreamHandler, setStreamHandler)
 import LibP2P.Switch.Types
   ( Connection (..)
-  , MuxerSession (..)
   , Switch (..)
   )
 
@@ -118,6 +120,9 @@ data GossipSubNode = GossipSubNode
   , gsnSwitch    :: !Switch
   , gsnHeartbeat :: !(TVar (Maybe (Async ())))
   , gsnStreams   :: !(TVar (Map.Map PeerId StreamIO))  -- ^ Cached outbound streams per peer
+  , gsnDisconnectHook :: !(IORef (Maybe (Connection -> IO ())))
+    -- ^ Cleared by 'stopGossipSub' so a stopped node does not keep a
+    -- disconnect callback alive on the Switch (#290).
   }
 
 -- | Create a new GossipSub node with a Router wired to the Switch.
@@ -128,15 +133,20 @@ newGossipSubNode :: Switch -> GossipSubParams -> IO GossipSubNode
 newGossipSubNode sw params = do
   streamsVar <- newTVarIO Map.empty
   hbVar <- newTVarIO Nothing
+  hook <- newIORef Nothing
   -- Create router with real sendRPC that uses the Switch
   let localPid = swLocalPeerId sw
   router <- newRouter params localPid (sendRPCviaSwitch sw streamsVar) getCurrentTime
-  pure GossipSubNode
-    { gsnRouter    = router
-    , gsnSwitch    = sw
-    , gsnHeartbeat = hbVar
-    , gsnStreams   = streamsVar
-    }
+  let node = GossipSubNode
+        { gsnRouter    = router
+        , gsnSwitch    = sw
+        , gsnHeartbeat = hbVar
+        , gsnStreams   = streamsVar
+        , gsnDisconnectHook = hook
+        }
+  writeIORef hook (Just (dropCachedGossipStream sw streamsVar))
+  atomically $ modifyTVar' (swDisconnectNotifiers sw) (runGossipDisconnect hook :)
+  pure node
 
 -- | Send an RPC to a peer via cached or newly opened stream.
 sendRPCviaSwitch :: Switch -> TVar (Map.Map PeerId StreamIO) -> PeerId -> RPC -> IO ()
@@ -150,6 +160,7 @@ sendRPCviaSwitch sw streamsVar pid rpc = do
       case sendResult of
         Right () -> pure ()
         Left _ -> do
+          closeQuietly stream
           atomically $ modifyTVar' streamsVar (Map.delete pid)
           openAndSend sw streamsVar pid rpc
     Nothing -> openAndSend sw streamsVar pid rpc
@@ -161,7 +172,11 @@ openAndSend sw streamsVar pid rpc = do
   case mStream of
     Nothing -> pure ()  -- No connection to peer; fire-and-forget
     Just stream -> do
-      atomically $ modifyTVar' streamsVar (Map.insert pid stream)
+      mOld <- atomically $ do
+        streams <- readTVar streamsVar
+        writeTVar streamsVar (Map.insert pid stream streams)
+        pure (Map.lookup pid streams)
+      mapM_ closeQuietly mOld
       _ <- trySend stream rpc
       pure ()
 
@@ -172,7 +187,7 @@ openStreamToPeer sw pid = do
   case mConn of
     Nothing -> pure Nothing
     Just conn -> do
-      result <- (Right <$> openAndNegotiate conn) `catch`
+      result <- (Right <$> openAndNegotiate sw conn) `catch`
                   (\(_ :: SomeException) -> pure (Left ()))
       case result of
         Left () -> pure Nothing
@@ -180,13 +195,19 @@ openStreamToPeer sw pid = do
 
 -- | Open a mux stream and negotiate a GossipSub protocol, preferring
 -- /meshsub/1.1.0 and falling back to /meshsub/1.0.0 (#157).
-openAndNegotiate :: Connection -> IO (Maybe (StreamIO, PeerProtocol))
-openAndNegotiate conn = do
-  stream <- muxOpenStream (connSession conn)
-  negResult <- negotiateInitiator stream gossipSubProtocolIds
-  case negResult of
-    Accepted proto -> pure (Just (stream, protocolFor proto))
-    NoProtocol -> pure Nothing
+openAndNegotiate :: Switch -> Connection -> IO (Maybe (StreamIO, PeerProtocol))
+openAndNegotiate sw conn = do
+  opened <- newStream sw conn
+  case opened of
+    Left _ -> pure Nothing
+    Right stream -> do
+      negResult <- negotiateInitiator stream gossipSubProtocolIds
+        `onException` closeQuietly stream
+      case negResult of
+        Accepted proto -> pure (Just (stream, protocolFor proto))
+        NoProtocol -> do
+          closeQuietly stream
+          pure Nothing
 
 -- | Extract the remote IP bytes (4 for IPv4, 16 for IPv6) from a
 -- connection's multiaddr, for P6 IP colocation scoring.
@@ -265,12 +286,16 @@ onNewConnection :: GossipSubNode -> Connection -> IO ()
 onNewConnection node conn = do
   let pid = connPeerId conn
   -- Open a mux stream and negotiate GossipSub protocol
-  mStream <- openAndNegotiate conn
+  mStream <- openAndNegotiate (gsnSwitch node) conn
   case mStream of
     Nothing -> pure ()  -- Peer doesn't support GossipSub
     Just (stream, proto) -> do
-      -- Cache the outbound stream
-      atomically $ modifyTVar' (gsnStreams node) (Map.insert pid stream)
+      -- Cache the outbound stream, releasing any stream it replaces.
+      mOld <- atomically $ do
+        streams <- readTVar (gsnStreams node)
+        writeTVar (gsnStreams node) (Map.insert pid stream streams)
+        pure (Map.lookup pid streams)
+      mapM_ closeQuietly mOld
       -- Register peer with its negotiated protocol version
       -- (IP feeds P6 colocation scoring)
       now <- getCurrentTime
@@ -321,6 +346,7 @@ outboundReadLoop node stream pid = loop
 -- | Stop the GossipSub node: cancel heartbeat and unregister handler.
 stopGossipSub :: GossipSubNode -> IO ()
 stopGossipSub node = do
+  writeIORef (gsnDisconnectHook node) Nothing
   -- Cancel heartbeat
   mHb <- atomically $ do
     hb <- readTVar (gsnHeartbeat node)
@@ -331,6 +357,37 @@ stopGossipSub node = do
     Nothing -> pure ()
   -- Unregister stream handlers for both protocol versions
   mapM_ (removeStreamHandler (gsnSwitch node)) gossipSubProtocolIds
+  closeCachedStreams node
+
+-- | Close every cached outbound stream, releasing its resource slot.
+closeCachedStreams :: GossipSubNode -> IO ()
+closeCachedStreams node = do
+  streams <- atomically $ do
+    m <- readTVar (gsnStreams node)
+    writeTVar (gsnStreams node) Map.empty
+    pure (Map.elems m)
+  mapM_ closeQuietly streams
+
+-- | Run the disconnect hook unless 'stopGossipSub' has cleared it.
+runGossipDisconnect :: IORef (Maybe (Connection -> IO ())) -> Connection -> IO ()
+runGossipDisconnect hook conn = do
+  mAct <- readIORef hook
+  mapM_ ($ conn) mAct
+
+-- | Drop the cached stream when this was the peer's last connection.
+dropCachedGossipStream
+  :: Switch -> TVar (Map.Map PeerId StreamIO) -> Connection -> IO ()
+dropCachedGossipStream sw streamsVar conn = do
+  remaining <- atomically $ lookupConn (swConnPool sw) (connPeerId conn)
+  case remaining of
+    Just _ -> pure ()
+    Nothing -> do
+      mStream <- atomically $ do
+        streams <- readTVar streamsVar
+        let pid = connPeerId conn
+        writeTVar streamsVar (Map.delete pid streams)
+        pure (Map.lookup pid streams)
+      mapM_ closeQuietly mStream
 
 -- | Subscribe to a topic.
 gossipJoin :: GossipSubNode -> Topic -> IO ()
