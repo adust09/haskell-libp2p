@@ -78,8 +78,9 @@ import LibP2P.MultistreamSelect.Negotiation
   , negotiateInitiator
   )
 import LibP2P.Switch (setStreamHandler)
+import LibP2P.Switch.Connection (newStream)
 import LibP2P.Switch.ConnPool (lookupConn)
-import LibP2P.Switch.Types (Connection (..), MuxerSession (..), Switch (..))
+import LibP2P.Switch.Types (Connection (..), Switch (..))
 
 -- | DHT protocol identifier for multistream-select.
 dhtProtocolId :: Text
@@ -553,14 +554,21 @@ openDHTStream sw pid = do
   case mConn of
     Nothing -> pure (Left "no open connection to peer")
     Just conn -> do
-      result <- try $ do
-        stream <- muxOpenStream (connSession conn)
-        negotiated <- negotiateInitiator stream [dhtProtocolId]
-        pure (stream, negotiated)
-      pure $ case result of
-        Left (e :: SomeException) -> Left ("failed to open DHT stream: " ++ show e)
-        Right (stream, Accepted _) -> Right stream
-        Right (_, NoProtocol) -> Left "peer does not support /ipfs/kad/1.0.0"
+      opened <- newStream sw conn
+      case opened of
+        Left err -> pure (Left ("stream reservation failed: " ++ show err))
+        Right stream -> negotiateOpened stream
+  where
+    negotiateOpened stream = do
+      result <- try $ negotiateInitiator stream [dhtProtocolId]
+      case result of
+        Left (e :: SomeException) -> do
+          closeQuietly stream
+          pure (Left ("failed to open DHT stream: " ++ show e))
+        Right (Accepted _) -> pure (Right stream)
+        Right NoProtocol -> do
+          closeQuietly stream
+          pure (Left "peer does not support /ipfs/kad/1.0.0")
 
 -- Store operations
 
