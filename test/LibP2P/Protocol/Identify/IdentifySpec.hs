@@ -214,7 +214,7 @@ spec = do
               Left parseErr -> expectationFailure $ "Decode failed: " ++ show parseErr
               Right info -> do
                 idProtocolVersion info `shouldBe` Just "ipfs/0.1.0"
-                idAgentVersion info `shouldBe` Just "hs-libp2p/0.1.0"
+                idAgentVersion info `shouldBe` Just agentVersion
 
     it "handleIdentify populates observedAddr with the connection's remote address" $ do
       sw <- mkTestSwitch
