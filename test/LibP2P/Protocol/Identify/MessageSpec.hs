@@ -8,7 +8,7 @@ import Test.Hspec
 fullInfo :: IdentifyInfo
 fullInfo = IdentifyInfo
   { idProtocolVersion = Just "ipfs/0.1.0"
-  , idAgentVersion    = Just "libp2p-hs/0.1.0"
+  , idAgentVersion    = Just "hs-libp2p/0.1.0"
   , idPublicKey       = Just (BS.pack [0x08, 0x01, 0x12, 0x20, 1, 2, 3, 4])
   , idListenAddrs     = [BS.pack [4, 127, 0, 0, 1, 6, 0x10, 0x01],
                           BS.pack [4, 10, 0, 0, 1, 6, 0x0F, 0xA1]]

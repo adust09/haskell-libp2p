@@ -1,4 +1,4 @@
--- | libp2p-hs: Haskell implementation of the libp2p networking stack.
+-- | hs-libp2p: Haskell implementation of the libp2p networking stack.
 --
 -- This is the public API facade for the library. Import this module
 -- for the common types and functions needed to build a libp2p node:

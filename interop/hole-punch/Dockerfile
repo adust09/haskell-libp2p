@@ -1,4 +1,4 @@
-# Multi-stage build for the libp2p-hs hole-punch test daemon.
+# Multi-stage build for the hs-libp2p hole-punch test daemon.
 # Used by the libp2p/unified-testing hole-punch framework; build context
 # is the repository root.
 
@@ -7,7 +7,7 @@ FROM haskell:9.10-slim-bookworm AS builder
 
 WORKDIR /app
 
-COPY libp2p-hs.cabal cabal.project ./
+COPY hs-libp2p.cabal cabal.project ./
 
 # Fix ppad-sha256 ARM SHA2 intrinsic compilation on Docker (GCC 12).
 RUN if [ "$(uname -m)" = "aarch64" ]; then \
@@ -15,7 +15,7 @@ RUN if [ "$(uname -m)" = "aarch64" ]; then \
       echo '  ghc-options: -optc-march=armv8-a+crypto' >> cabal.project; \
     fi
 
-RUN cabal update && cabal build --only-dependencies lib:libp2p-hs
+RUN cabal update && cabal build --only-dependencies lib:hs-libp2p
 
 COPY src/ src/
 COPY interop/ interop/

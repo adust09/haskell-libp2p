@@ -1,4 +1,4 @@
-# Self-to-self interop test: libp2p-hs listener + libp2p-hs dialer.
+# Self-to-self interop test: hs-libp2p listener + hs-libp2p dialer.
 # Both peers speak the unified-testing "modern" transport contract.
 # Usage: docker compose up --build --exit-code-from dialer
 x-hs-env: &hs-env

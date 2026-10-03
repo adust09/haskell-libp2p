@@ -1,4 +1,4 @@
-# Perf self-test: libp2p-hs listener + libp2p-hs dialer.
+# Perf self-test: hs-libp2p listener + hs-libp2p dialer.
 #
 # Speaks the unified-testing perf contract: the listener SETs
 # `{TEST_KEY}_listener_multiaddr` in Redis and the dialer polls GET
@@ -36,7 +36,7 @@ services:
     build:
       context: .
       dockerfile: interop/perf/Dockerfile
-    image: libp2p-hs-perf:latest
+    image: hs-libp2p-perf:latest
     depends_on:
       redis:
         condition: service_healthy
@@ -48,7 +48,7 @@ services:
     build:
       context: .
       dockerfile: interop/perf/Dockerfile
-    image: libp2p-hs-perf:latest
+    image: hs-libp2p-perf:latest
     depends_on:
       redis:
         condition: service_healthy

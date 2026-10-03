@@ -32,7 +32,7 @@ jobs:
           path: |
             ~/.cabal/store
             dist-newstyle
-          key: ${{ runner.os }}-haddock-${{ hashFiles('libp2p-hs.cabal', 'cabal.project') }}
+          key: ${{ runner.os }}-haddock-${{ hashFiles('hs-libp2p.cabal', 'cabal.project') }}
           restore-keys: ${{ runner.os }}-haddock-
 
       - name: Build dependencies

@@ -25,7 +25,7 @@ jobs:
           path: |
             ~/.cabal/store
             dist-newstyle
-          key: ${{ runner.os }}-cabal-${{ hashFiles('libp2p-hs.cabal', 'cabal.project') }}
+          key: ${{ runner.os }}-cabal-${{ hashFiles('hs-libp2p.cabal', 'cabal.project') }}
           restore-keys: |
             ${{ runner.os }}-cabal-
 

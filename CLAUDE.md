@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-libp2p-hs is a Haskell implementation of the [libp2p](https://libp2p.io/) networking stack. The authoritative references for all implementation work are the [upstream libp2p specs](https://github.com/libp2p/specs) and the mature reference implementations (go-libp2p, rust-libp2p).
+hs-libp2p is a Haskell implementation of the [libp2p](https://libp2p.io/) networking stack. The authoritative references for all implementation work are the [upstream libp2p specs](https://github.com/libp2p/specs) and the mature reference implementations (go-libp2p, rust-libp2p).
 
 ## Current State
 

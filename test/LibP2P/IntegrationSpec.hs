@@ -205,7 +205,7 @@ spec = do
           Nothing -> expectationFailure "identify timed out"
           Just (Left err) -> expectationFailure $ "identify failed: " ++ err
           Just (Right info) -> do
-            idAgentVersion info `shouldBe` Just "libp2p-hs/0.1.0"
+            idAgentVersion info `shouldBe` Just "hs-libp2p/0.1.0"
             idProtocols info `shouldSatisfy` (not . null)
 
     it "idListenAddrs populated after switchListen" $ do
@@ -399,7 +399,7 @@ spec = do
       -- stream write must be chunked across noise frames (#183) and
       -- reassembled intact — on four streams at once.
       withConnectedPair $ \_nodeA (swB, _pidB) conn -> do
-        let echoProto = "/libp2p-hs/test-echo/1.0.0"
+        let echoProto = "/hs-libp2p/test-echo/1.0.0"
             payloadSize = 66000
         setStreamHandler swB echoProto $ \_c stream -> do
           payload <- readN stream payloadSize

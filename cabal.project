@@ -13,5 +13,5 @@ tests: True
 -- Local: set 'with-compiler' in cabal.project.local if needed.
 
 -- Enable all warnings
-package libp2p-hs
+package hs-libp2p
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wpartial-fields -Wredundant-constraints

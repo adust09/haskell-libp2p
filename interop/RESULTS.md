@@ -23,12 +23,12 @@ The QUIC transport passed the same ping contract in both directions against
 multiplexing natively, so `SECURE_CHANNEL` and `MUXER` are unset.
 
 ```bash
-# go-libp2p listener, libp2p-hs dialer
+# go-libp2p listener, hs-libp2p dialer
 docker compose -f docker-compose.cross.yml \
   -f docker-compose.quic-cross.yml up --build \
   --exit-code-from hs-dialer redis go-listener hs-dialer
 
-# libp2p-hs listener, go-libp2p dialer
+# hs-libp2p listener, go-libp2p dialer
 docker compose -f docker-compose.cross.yml \
   -f docker-compose.quic-cross.yml up --build \
   --exit-code-from go-dialer redis hs-listener go-dialer
@@ -52,7 +52,7 @@ go-libp2p interoperability. CI runs these two commands after the TCP matrix.
 
 | Item | Value |
 |------|-------|
-| libp2p-hs commit | `d0b74b7` (plus the conformance fixes in this PR) |
+| hs-libp2p commit | `d0b74b7` (plus the conformance fixes in this PR) |
 | go-libp2p | `v0.48.0` (`062200be7aa1d18a0f54eefb17b0dbe2e96f0a79`) |
 | Transport / Security / Muxer | `tcp` / `noise` / `yamux` |
 | GHC (in Docker) | 9.10 (`haskell:9.10-slim-bookworm`) |
@@ -75,7 +75,7 @@ go-libp2p interoperability. CI runs these two commands after the TCP matrix.
 Both directions exit 0 on the process whose exit code the framework keys on (the dialer),
 asserted explicitly via `docker compose up --exit-code-from <dialer-service>`.
 
-#### Direction 1 — go-libp2p listener, libp2p-hs dialer
+#### Direction 1 — go-libp2p listener, hs-libp2p dialer
 
 Command:
 
@@ -94,7 +94,7 @@ docker compose -f docker-compose.cross.yml up --build \
 - **hs-dialer exited 0.** (go-listener exited 2 because `--exit-code-from` aborts the
   remaining services once the dialer finishes — expected, not a failure.)
 
-#### Direction 2 — libp2p-hs listener, go-libp2p dialer
+#### Direction 2 — hs-libp2p listener, go-libp2p dialer
 
 Command:
 
