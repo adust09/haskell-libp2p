@@ -174,7 +174,7 @@ spec = do
       sw <- mkTestSwitch
       info <- buildLocalIdentify sw Nothing
       idProtocolVersion info `shouldBe` Just "ipfs/0.1.0"
-      idAgentVersion info `shouldBe` Just "hs-libp2p/0.1.0"
+      idAgentVersion info `shouldBe` Just agentVersion
 
     it "buildLocalIdentify advertises exactly the registered protocol set" $ do
       sw <- mkTestSwitch
