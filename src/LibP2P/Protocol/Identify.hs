@@ -88,7 +88,11 @@ import Data.Version (showVersion)
 agentVersion :: Text
 agentVersion =
   let version = showVersion Pkg.version
-  in T.pack $ Pkg.name <> "/" <> version
+      name = map kebab Pkg.name
+  in T.pack $ name <> "/" <> version
+  where
+    kebab '_' = '-'
+    kebab c = c
 
 -- | Identify protocol ID.
 identifyProtocolId :: ProtocolId
